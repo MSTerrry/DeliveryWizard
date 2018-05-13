@@ -38,26 +38,28 @@ namespace DW.Web.Controllers
                     row.WayPoints = new Collection<DbWayPoint>();
                     
                     foreach (var wpDto in dto.WayPoints)
-                    {                                               
-                        row.WayPoints.Add(new DbWayPoint
+                    {
+                        var wp = new DbWayPoint
                         {
                             Address = wpDto.Address,
                             PlaceTitle = wpDto.PlaceTitle,
-                            ShopType = wpDto.ShopType,                                                        
-                        });                        
-                        var Pl = new Collection<DbProduct>();
+                            ShopType = wpDto.ShopType,
+                        };
+                        row.WayPoints.Add(wp); 
+                        wp.ProductsList = new Collection<DbProduct>();
                         foreach (var product in wpDto.ProductsList)
                         {
-                            Pl.Add(new DbProduct
+                            var p = new DbProduct
                             {
                                 Name = product.Name,
                                 Amount = product.Amount,
                                 Additions = product.Additions,
-                                Cost = product.Cost,                                
-                            });
-                        }
-                        db.productList.AddRange(Pl);
-                    }                    
+                                Cost = product.Cost,
+                            };
+                            wp.ProductsList.Add(p);                           
+                        }                        
+                     db.productList.AddRange(wp.ProductsList);
+                    }  
                     db.DeliveryRequest.Add(row);                                       
                     db.SaveChanges();
                 }
