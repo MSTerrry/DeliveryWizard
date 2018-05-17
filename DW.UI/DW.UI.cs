@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -112,16 +113,71 @@ namespace DW.UI
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            var lv = new LicenceValidator();
+            CheckLicense();
+        }
+
+        private void CheckLicense()
+        {
+            var lv = new LicenceValidator(Directory.GetCurrentDirectory());
             if (!lv.HasLicense)
             {
-                MessageBox.Show("Лицензия не найдена.");
-                Application.Exit();
+                MessageBox.Show("Лицензия не найдена. Укажите путь к папке с лицензией.");
+                FolderBrowserDialog dr = new FolderBrowserDialog();
+                var result = dr.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    CheckLicense(dr.SelectedPath);
+                }
+                if (result == DialogResult.Cancel)
+                {
+                    Application.Exit();
+                }
+            }
+            else if (!lv.IsValid)
+            {
+                MessageBox.Show("Лицензия просрочена.Укажите путь к папке с лицензией.");
+                FolderBrowserDialog dr = new FolderBrowserDialog();
+                var result = dr.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    CheckLicense(dr.SelectedPath);
+                }
+                if (result == DialogResult.Cancel)
+                {
+                    Application.Exit();
+                }
+            }
+        }
+        private void CheckLicense(string newPath)
+        {
+            var lv = new LicenceValidator(newPath);
+            if (!lv.HasLicense)
+            {
+                MessageBox.Show("Лицензия не найдена. Укажите путь к папке с лицензией.");
+                FolderBrowserDialog dr = new FolderBrowserDialog();                                
+                var result = dr.ShowDialog();
+                if(result == DialogResult.OK)
+                {
+                    CheckLicense(dr.SelectedPath);
+                }
+                if (result == DialogResult.Cancel)
+                {
+                    Application.Exit();
+                }                
             }
             if (!lv.IsValid)
             {
-                MessageBox.Show("Лицензия просрочена.");
-                Application.Exit();
+                MessageBox.Show("Лицензия просрочена.Укажите путь к папке с лицензией.");
+                FolderBrowserDialog dr = new FolderBrowserDialog();
+                var result = dr.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    CheckLicense(dr.SelectedPath);
+                }
+                if (result == DialogResult.Cancel)
+                {
+                    Application.Exit();
+                }
             }
         }
     }

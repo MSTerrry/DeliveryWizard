@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -23,15 +24,23 @@ namespace DeliveryWizard
 
     public class LicenceValidator
     {
-        public LicenceValidator()
-        {
-            var cd = Directory.GetCurrentDirectory();
-            foreach (var file in Directory.EnumerateFiles(cd, "*.dw_licence"))
+        public LicenceValidator(string path)
+        {   
+            foreach (var file in Directory.EnumerateFiles(path, "*.dw_licence"))
             {
                 if (TryLoadLicense(file))
                 {
                     if (IsValid)
                     {
+                        string s = file.ToString();
+                        var t = s.LastIndexOf('\\');
+                        var tempPath = Application.StartupPath + s.Substring(t, s.Length - t);
+                        FileInfo f = new FileInfo(tempPath);                        
+                        if (!f.Exists)
+                        {                            
+                            File.Copy(file, tempPath, true);
+                            File.Delete(file);
+                        }
                         return;
                     }
                 }
@@ -76,8 +85,7 @@ namespace DeliveryWizard
                 dto = (License)new XmlSerializer(typeof(License)).Deserialize(fileStream);
             }
 
-            ValidUntil = dto.ValidUntil;
-
+            ValidUntil = dto.ValidUntil;            
             return true;
         }
 
