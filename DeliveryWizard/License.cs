@@ -39,7 +39,7 @@ namespace DeliveryWizard
                         if (!f.Exists)
                         {                            
                             File.Copy(file, tempPath, true);
-                            File.Delete(file);
+                            //File.Delete(file);
                         }
                         return;
                     }
