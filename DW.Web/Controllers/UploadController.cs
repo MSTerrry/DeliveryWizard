@@ -44,6 +44,7 @@ namespace DW.Web.Controllers
                             Address = wpDto.Address,
                             PlaceTitle = wpDto.PlaceTitle,
                             ShopType = wpDto.ShopType,
+                            TotalCost = wpDto.TotalCost
                         };
                         row.WayPoints.Add(wp);
                         wp.ProductsList = new Collection<DbProduct>();

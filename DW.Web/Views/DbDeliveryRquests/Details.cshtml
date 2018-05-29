@@ -78,8 +78,9 @@
                 }
             </tbody>
         </table>
-        <div><h4>Общая стоимость продуктов @Model.TotalCost <h4></div> </li>
+        <div><h5>Общая стоимость продуктов в этом месте @wp.TotalCost <h5></div> </li>
 }
+<div><h5>Общая стоимость продуктов @Model.TotalCost <h5></div>
         <p>
             @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
             @Html.ActionLink("Back to List", "Index")

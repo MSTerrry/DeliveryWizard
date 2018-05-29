@@ -8,6 +8,10 @@ using System.Web;
 using System.Web.Mvc;
 using DW.Web.Models;
 using System.Data.SqlClient;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using System.IO;
+using System.Web.Hosting;
 
 namespace DW.Web.Controllers
 {
@@ -144,6 +148,69 @@ namespace DW.Web.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        public ActionResult Print(int? id)
+        {
+            var ctx = new ApplicationDbContext();
+            var g = ctx.DeliveryRequest.Find(id);
+
+            ExcelPackage pkg;
+            using (var stream = System.IO.File.OpenRead(HostingEnvironment.ApplicationPhysicalPath + "template.xlsx"))
+            {
+                pkg = new ExcelPackage(stream);
+                stream.Dispose();
+            }
+
+            var worksheet = pkg.Workbook.Worksheets[1];
+            worksheet.Name = "Информация о заказе";
+
+            worksheet.Cells[2, 3].Value = g.FullName;
+            worksheet.Cells[3, 3].Value = g.Filled.ToString();
+            worksheet.Cells[4, 3].Value = g.ClientAddress;
+            worksheet.Cells[5, 3].Value = g.TimeDeliver.ToString();
+            worksheet.Cells[6, 3].Value = g.TotalCost;            
+            var row = 2;
+            var column = 7;
+            var tableColumn = 10;
+            foreach (var e in g.WayPoints)
+            {
+                worksheet.Cells[row, column].Value = "Название места";
+                worksheet.Cells[row + 1, column].Value = "Адрес";
+                worksheet.Cells[row + 2, column].Value = "Тип места";
+                worksheet.Cells[row + 3, column].Value = "общая стоимость покупок в этом месте";
+                worksheet.Cells[row, column+1].Value = e.PlaceTitle;
+                worksheet.Cells[row + 1, column+1].Value = e.Address;
+                worksheet.Cells[row + 2, column+1].Value = e.ShopType;
+                worksheet.Cells[row + 3, column+1].Value = e.TotalCost;
+                var temp = row + 3;
+                worksheet.Cells[row, tableColumn].Value = "Название";
+                worksheet.Cells[row, tableColumn+1].Value = "Количество";
+                worksheet.Cells[row, tableColumn+2].Value = "Дополнительная информация";
+                worksheet.Cells[row, tableColumn+3].Value = "Цена";                
+                var startRow = row;
+                foreach (var pr in e.ProductsList)
+                {
+                    row = row + 1;
+                    worksheet.Cells[row, tableColumn].Value = pr.Name;
+                    worksheet.Cells[row, tableColumn + 1].Value = pr.Amount;
+                    worksheet.Cells[row , tableColumn + 2].Value = pr.Additions;
+                    worksheet.Cells[row, tableColumn + 3].Value = pr.Cost;                                 
+                }
+                row = temp > row ? temp+2 : row+2;
+                using (var cells = worksheet.Cells[startRow, tableColumn, startRow + e.ProductsList.Count, tableColumn + 3])
+                {
+                    cells.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                    cells.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                    cells.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                    cells.Style.Border.Left.Style = ExcelBorderStyle.Thin;                    
+                }
+            }
+            worksheet.Cells.AutoFitColumns();
+            var ms = new MemoryStream();
+            pkg.SaveAs(ms);
+
+            return File(ms.ToArray(), "application/ooxml", ((g.FullName ?? "Без Названия") + g.Filled.ToString()).Replace(" ", "") + ".xlsx");
         }
     }
 }
