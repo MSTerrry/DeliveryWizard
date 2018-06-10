@@ -199,6 +199,7 @@
             this.CostUD.Name = "CostUD";
             this.CostUD.Size = new System.Drawing.Size(75, 20);
             this.CostUD.TabIndex = 16;
+            this.CostUD.ValueChanged += new System.EventHandler(this.CostUD_ValueChanged);
             // 
             // Form1
             // 

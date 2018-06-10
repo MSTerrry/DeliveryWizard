@@ -89,7 +89,18 @@ namespace DeliveryWizard
         /// <summary>
         /// Количество
         /// </summary>
-        public float Amount { get; set; }
+        public float Amount {
+            get
+            {
+                return amount;
+            }
+            set
+            {
+                 amount = value;
+            }
+        }
+
+        private float amount = 1;
 
         /// <summary>
         /// Дополнительные сведения о продукте

@@ -23,8 +23,7 @@ namespace DW.Web.Controllers
         {            
             if (file != null && file.ContentLength > 0)
             {
-                var dto = DeliverySerializer.LoadFromStream(file.InputStream);
-                Dictionary<string, int> titleArray = new Dictionary<string, int>();
+                var dto = DeliverySerializer.LoadFromStream(file.InputStream);                
                 using (var db = new ApplicationDbContext())
                 {
                     var row = new DbDeliveryRquest

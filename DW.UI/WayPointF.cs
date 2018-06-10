@@ -13,6 +13,8 @@ namespace DW.UI
 {
     public partial class WayPointF : Form
     {
+        public decimal bottomLine;
+        public bool checkActive = true;        
         public WayPoint wp { get; set; }
         public WayPointF(WayPoint wp)
         {
@@ -54,13 +56,16 @@ namespace DW.UI
                 ProductList.Items.Add(product.Prod);
             }
             CostUD.Value += (decimal)product.Prod.Amount* (decimal)product.Prod.Cost;
-            Save.Enabled = true;
+            bottomLine = CostUD.Value;
+            if(ProductList.Items.Count > 0) Save.Enabled = true;
         }
 
         private void Delete_Click(object sender, EventArgs e)
         {
             var prod = (Product)ProductList.SelectedItem;
+            checkActive = false;
             CostUD.Value -= (decimal)prod.Cost;
+            bottomLine = CostUD.Value;
             ProductList.Items.Remove(ProductList.SelectedItem);
             if (ProductList.Items.Count == 0) Save.Enabled = false;
         }
@@ -70,6 +75,7 @@ namespace DW.UI
             var prod = ProductList.SelectedItem as Product;
             if (prod == null)
                 return;                          
+            checkActive = false;
             CostUD.Value -= (decimal)prod.Amount* (decimal)prod.Cost;
             var form = new ProductForm(prod.Clone());
             var res = form.ShowDialog(this);
@@ -80,6 +86,7 @@ namespace DW.UI
                 ProductList.Items.Insert(si,form.Prod);
             }            
             CostUD.Value += (decimal)form.Prod.Amount* (decimal)form.Prod.Cost;
+            bottomLine = CostUD.Value;
         }
 
         private void ProductList_SelectedIndexChanged(object sender, EventArgs e)
@@ -88,6 +95,28 @@ namespace DW.UI
                 Delete.Enabled = true;
             else
                 Delete.Enabled = false;
-        }        
+        }
+
+        private float Summarise ()
+        {
+            float sum = 0;            
+            foreach(var e in ProductList.Items)
+            {
+                var p = (Product)e;
+                sum += p.Cost * p.Amount;
+            }
+            return sum;
+        }
+
+        private void CostUD_ValueChanged(object sender, EventArgs e)
+        {
+            if (checkActive)
+            {
+                bottomLine = (decimal)Summarise();
+                if (CostUD.Value < bottomLine)
+                    CostUD.Value = bottomLine;
+                else Save.Enabled = true;
+            }            
+        }
     }
 }

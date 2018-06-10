@@ -14,6 +14,8 @@ namespace DW.UI
 {
     public partial class Form1 : Form
     {
+        public decimal bottomLine;
+        public bool checkActive = true;
         public Form1()
         {
             InitializeComponent();
@@ -76,13 +78,16 @@ namespace DW.UI
             {
                 listBox1.Items.Add(form.wp);                
             }
-            CostUD.Value += form.wp.TotalCost;            
+            CostUD.Value += form.wp.TotalCost;
+            bottomLine = CostUD.Value;
         }
 
         private void Delete_Click(object sender, EventArgs e)
         {
             var wp = (WayPoint)listBox1.SelectedItem;
+            checkActive = false;
             CostUD.Value -= wp.TotalCost;
+            bottomLine = CostUD.Value;
             listBox1.Items.Remove(listBox1.SelectedItem);
         }
 
@@ -91,6 +96,7 @@ namespace DW.UI
             var wp = listBox1.SelectedItem as WayPoint;
             if (wp == null)
                 return;
+            checkActive = false;
             CostUD.Value -= wp.TotalCost;
             var form = new WayPointF(wp.Clone());
             var res = form.ShowDialog(this);
@@ -101,6 +107,7 @@ namespace DW.UI
                 listBox1.Items.Insert(si, form.wp);
             }
             CostUD.Value += form.wp.TotalCost;
+            bottomLine = CostUD.Value;
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -178,6 +185,27 @@ namespace DW.UI
                 {
                     Application.Exit();
                 }
+            }
+        }
+
+        private decimal Summarise()
+        {
+            decimal sum = 0;
+            foreach (var e in listBox1.Items)
+            {
+                var wp = (WayPoint)e;
+                sum += wp.TotalCost;
+            }
+            return sum;
+        }
+
+        private void CostUD_ValueChanged(object sender, EventArgs e)
+        {
+            if (checkActive)
+            {
+                bottomLine = bottomLine != CostUD.Value ? Summarise() : bottomLine;
+                if (CostUD.Value < bottomLine)
+                    CostUD.Value = bottomLine;
             }
         }
     }

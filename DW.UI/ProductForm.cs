@@ -17,7 +17,7 @@ namespace DW.UI
         public ProductForm(Product Prod)
         {
             this.Prod = Prod;
-            InitializeComponent();
+            InitializeComponent();            
         }
 
         private void OK_Click(object sender, EventArgs e)
@@ -38,9 +38,9 @@ namespace DW.UI
 
         private void AmountBox_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (!(Char.IsDigit(e.KeyChar)) && !((e.KeyChar == ',') &&(((TextBox)sender).Text.IndexOf(",") == -1) &&(((TextBox)sender).Text.Length != 0)))
+            if (!(Char.IsDigit(e.KeyChar)) && !((e.KeyChar == ',') && (((TextBox)sender).Text.IndexOf(",") == -1) && (((TextBox)sender).Text.Length != 0)))
             {
-                if (e.KeyChar != (char)Keys.Back)
+                if (e.KeyChar != (char)Keys.Back || e.KeyChar != (char)Keys.Delete)
                 {
                     e.Handled = true;
                 }
